@@ -3,7 +3,7 @@ const taskController = require("../controller/task.controller")
 
 router.route("/tasks")
     .post(function (req, res) {
-        res.json(req.body).status(200).send();
+        taskController.store(req.body).then(data => res.json(data));
     });
 
 
@@ -12,6 +12,10 @@ router.route("/tasks")
         taskController.index().then(data => res.json(data));
     });
 
+router.route("/tasks/:id")
+    .get(function (req, res) {
+       taskController.show(req.params.id).then(data => res.json(data));
+    });
 
 
 module.exports = router;
