@@ -53,6 +53,32 @@ class TaskRepository {
             console.log(error);
         }
     }
+
+    async updateTask(id, requestBody) {
+        try {
+            const file = readFileSync(this.filePath);
+
+            const data = JSON.parse(file.toString());
+
+            const tasks = Object.entries(data).map(
+                function ([key, task]) {
+                    if (task['id'] == id) {
+                        task['title']       = requestBody['title'];
+                        task['description'] = requestBody['description'];
+                    }
+                    return task;
+                }
+            );
+
+            await writeFile(this.filePath, JSON.stringify(tasks));
+
+            return "task updated";
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 

@@ -12,6 +12,10 @@ class TaskService {
     async createTask(requestBody) {
         return await taskRepository.createTask(requestBody);
     }
+
+    async updateTask(id, requestBody) {
+        return await taskRepository.updateTask(id, requestBody);
+    }
 }
 
 

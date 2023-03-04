@@ -12,6 +12,10 @@ class TasksController {
     async store(requestBody) {
         return await taskService.createTask(requestBody);
     }
+
+    async update(id, requestBody) {
+        return await taskService.updateTask(id, requestBody);
+    }
 }
 
 module.exports = new TasksController();

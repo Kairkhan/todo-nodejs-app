@@ -18,4 +18,10 @@ router.route("/tasks/:id")
     });
 
 
+router.route("/tasks/:id")
+    .put(function (req, res) {
+        taskController.update(req.params.id, req.body).then(data => res.json(data));
+    });
+
+
 module.exports = router;
