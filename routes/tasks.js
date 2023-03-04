@@ -9,7 +9,7 @@ router.route("/tasks")
 
 router.route("/tasks")
     .get(function (req, res) {
-        taskController.index().then(data => res.json(data));
+        taskController.index(req.query).then(data => res.json(data));
     });
 
 router.route("/tasks/:id")
@@ -22,6 +22,11 @@ router.route("/tasks/:id")
     .put(function (req, res) {
         taskController.update(req.params.id, req.body).then(data => res.json(data));
     });
+
+router.route("/tasks/:id")
+    .delete(function (req, res) {
+        taskController.destroy(req.params.id).then(data => res.json(data));
+    })
 
 
 module.exports = router;

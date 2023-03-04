@@ -1,8 +1,8 @@
 const taskService = require("../service/task.service");
 
 class TasksController {
-    async index() {
-        return await taskService.getTasks();
+    async index(filters) {
+        return await taskService.getTasks(filters);
     }
 
     async show(id) {
@@ -15,6 +15,10 @@ class TasksController {
 
     async update(id, requestBody) {
         return await taskService.updateTask(id, requestBody);
+    }
+
+    async destroy(id) {
+        return await taskService.deleteTask(id);
     }
 }
 

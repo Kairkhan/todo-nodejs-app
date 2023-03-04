@@ -1,8 +1,8 @@
 const taskRepository = require("../repository/task.repository");
 
 class TaskService {
-    async getTasks() {
-        return await taskRepository.getTasks();
+    async getTasks(filters) {
+        return await taskRepository.getTasks(filters);
     }
 
     async getTaskById(id) {
@@ -15,6 +15,10 @@ class TaskService {
 
     async updateTask(id, requestBody) {
         return await taskRepository.updateTask(id, requestBody);
+    }
+
+    async deleteTask(id) {
+        return await taskRepository.deleteTask(id);
     }
 }
 

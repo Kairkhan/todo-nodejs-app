@@ -1,14 +1,25 @@
 const {readFile, writeFile} = require("fs/promises");
-const {readFileSync} = require("fs");
+const {readFileSync, existsSync, closeSync, openSync} = require("fs");
 
 class TaskRepository {
     constructor() {
         this.filePath = process.cwd() + "/database.json";
+        if (!existsSync(this.filePath)) {
+            closeSync(openSync(this.filePath, 'w'));
+        }
     }
-    async getTasks() {
+    async getTasks(filters) {
         try {
             const rawData = (await readFile(this.filePath)).toString();
-            return JSON.parse(rawData);
+
+            const tasks = JSON.parse(rawData);
+
+            if (filters.status) {
+                return tasks.filter((task) => task.status == filters.status);
+            }
+
+            return tasks;
+
         } catch (error) {
             console.log(error);
         }
@@ -17,10 +28,16 @@ class TaskRepository {
     async getTaskById(id) {
         try {
             const rawData = (await readFile(this.filePath)).toString();
-            const [, result] = Object.entries(JSON.parse(rawData)).find(
-                ([, task]) => task.id == id
+            const task  =  JSON.parse(rawData).find(
+                (task) => task.id == id
             );
-            return result;
+
+            if (!task) {
+                return "not found!";
+            }
+
+            return task;
+
         } catch (error) {
             console.log(error);
         }
@@ -60,8 +77,8 @@ class TaskRepository {
 
             const data = JSON.parse(file.toString());
 
-            const tasks = Object.entries(data).map(
-                function ([key, task]) {
+            const tasks = data.map(
+                function (task) {
                     if (task['id'] == id) {
                         task['title']       = requestBody['title'];
                         task['description'] = requestBody['description'];
@@ -73,6 +90,24 @@ class TaskRepository {
             await writeFile(this.filePath, JSON.stringify(tasks));
 
             return "task updated";
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async deleteTask(id) {
+        try {
+            const file = readFileSync(this.filePath);
+
+            const data = JSON.parse(file.toString());
+
+            const tasks = data.filter((task) => task.id != id);
+
+            await writeFile(this.filePath, JSON.stringify(tasks));
+
+            return "task deleted!";
 
 
         } catch (error) {
