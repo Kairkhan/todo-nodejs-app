@@ -8,6 +8,7 @@ class TaskRepository {
             closeSync(openSync(this.filePath, 'w'));
         }
     }
+
     async getTasks(filters) {
         try {
             const rawData = (await readFile(this.filePath)).toString();
@@ -108,6 +109,56 @@ class TaskRepository {
             await writeFile(this.filePath, JSON.stringify(tasks));
 
             return "task deleted!";
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async setStatusBacklog(id) {
+        try {
+            const file = readFileSync(this.filePath);
+
+            const data = JSON.parse(file.toString());
+
+            const tasks = data.map(
+                function (task) {
+                    if (task['id'] == id) {
+                        task['status']  = 'backlog';
+                    }
+                    return task;
+                }
+            );
+
+            await writeFile(this.filePath, JSON.stringify(tasks));
+
+            return "task status updated";
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async setStatusInProgress(id) {
+        try {
+            const file = readFileSync(this.filePath);
+
+            const data = JSON.parse(file.toString());
+
+            const tasks = data.map(
+                function (task) {
+                    if (task['id'] == id) {
+                        task['status']  = 'in-progress';
+                    }
+                    return task;
+                }
+            );
+
+            await writeFile(this.filePath, JSON.stringify(tasks));
+
+            return "task status updated";
 
 
         } catch (error) {

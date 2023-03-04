@@ -20,6 +20,14 @@ class TaskService {
     async deleteTask(id) {
         return await taskRepository.deleteTask(id);
     }
+
+    async setStatusBacklog(id) {
+        return await taskRepository.setStatusBacklog(id);
+    }
+
+    async setStatusInProgress(id) {
+        return await taskRepository.setStatusInProgress(id);
+    }
 }
 
 

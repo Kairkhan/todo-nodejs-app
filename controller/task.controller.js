@@ -20,6 +20,14 @@ class TasksController {
     async destroy(id) {
         return await taskService.deleteTask(id);
     }
+
+    async backlog(id) {
+        return await taskService.setStatusBacklog(id);
+    }
+
+    async inProgress(id) {
+        return await taskService.setStatusInProgress(id);
+    }
 }
 
 module.exports = new TasksController();

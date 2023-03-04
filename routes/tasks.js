@@ -26,7 +26,17 @@ router.route("/tasks/:id")
 router.route("/tasks/:id")
     .delete(function (req, res) {
         taskController.destroy(req.params.id).then(data => res.json(data));
-    })
+    });
+
+router.route("/tasks/:id/backlog")
+    .put(function (req, res) {
+        taskController.backlog(req.params.id).then(data => res.json(data));
+    });
+
+router.route("/tasks/:id/in-progress")
+    .put(function (req, res) {
+        taskController.inProgress(req.params.id).then(data => res.json(data));
+    });
 
 
 module.exports = router;
