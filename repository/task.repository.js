@@ -1,25 +1,17 @@
-const {readFile, writeFile} = require("fs/promises");
-const {readFileSync, existsSync, closeSync, openSync} = require("fs");
+const Task = require("../model/task.model");
 
 class TaskRepository {
     constructor() {
-        this.filePath = process.cwd() + "/database.json";
-        if (!existsSync(this.filePath)) {
-            closeSync(openSync(this.filePath, 'w'));
-        }
+        this.listOfFilters = ['status', 'title', 'description'];
     }
 
     async getTasks(filters) {
         try {
-            const rawData = (await readFile(this.filePath)).toString();
+            const updatedFilters = Object.fromEntries(
+                Object.entries(filters).filter(([key]) => this.listOfFilters.includes(key))
+            );
 
-            const tasks = JSON.parse(rawData);
-
-            if (filters.status) {
-                return tasks.filter((task) => task.status == filters.status);
-            }
-
-            return tasks;
+            return await Task.find(updatedFilters);
 
         } catch (error) {
             console.log(error);
@@ -28,16 +20,7 @@ class TaskRepository {
 
     async getTaskById(id) {
         try {
-            const rawData = (await readFile(this.filePath)).toString();
-            const task  =  JSON.parse(rawData).find(
-                (task) => task.id == id
-            );
-
-            if (!task) {
-                return "not found!";
-            }
-
-            return task;
+            return await Task.findById(id);
 
         } catch (error) {
             console.log(error);
@@ -46,26 +29,11 @@ class TaskRepository {
 
     async createTask(requestBody) {
         try {
-            const file = readFileSync(this.filePath);
-
-            const task = {
-                "id" : Math.floor(Math.random() * 100),
+            return await new Task({
                 "title" : requestBody['title'],
                 "description" : requestBody['description'],
                 "status" : "backlog"
-            }
-
-            if (file.length === 0) {
-                await writeFile(this.filePath, JSON.stringify([task]));
-            } else {
-                const data = JSON.parse(file.toString())
-
-                data.push(task)
-
-                await writeFile(this.filePath, JSON.stringify(data));
-            }
-
-            return task;
+            }).save();
 
         } catch (error) {
             console.log(error);
@@ -74,24 +42,9 @@ class TaskRepository {
 
     async updateTask(id, requestBody) {
         try {
-            const file = readFileSync(this.filePath);
-
-            const data = JSON.parse(file.toString());
-
-            const tasks = data.map(
-                function (task) {
-                    if (task['id'] == id) {
-                        task['title']       = requestBody['title'];
-                        task['description'] = requestBody['description'];
-                    }
-                    return task;
-                }
-            );
-
-            await writeFile(this.filePath, JSON.stringify(tasks));
-
-            return "task updated";
-
+            return await Task.findByIdAndUpdate(
+                id, requestBody, {new: true}
+            )
 
         } catch (error) {
             console.log(error);
@@ -100,17 +53,7 @@ class TaskRepository {
 
     async deleteTask(id) {
         try {
-            const file = readFileSync(this.filePath);
-
-            const data = JSON.parse(file.toString());
-
-            const tasks = data.filter((task) => task.id != id);
-
-            await writeFile(this.filePath, JSON.stringify(tasks));
-
-            return "task deleted!";
-
-
+            return await Task.findByIdAndDelete(id);
         } catch (error) {
             console.log(error);
         }
@@ -118,23 +61,11 @@ class TaskRepository {
 
     async setStatusBacklog(id) {
         try {
-            const file = readFileSync(this.filePath);
+            await Task.findById(id).updateOne({
+               "status" : "backlog"
+            });
 
-            const data = JSON.parse(file.toString());
-
-            const tasks = data.map(
-                function (task) {
-                    if (task['id'] == id) {
-                        task['status']  = 'backlog';
-                    }
-                    return task;
-                }
-            );
-
-            await writeFile(this.filePath, JSON.stringify(tasks));
-
-            return "task status updated";
-
+            return "task updated"
 
         } catch (error) {
             console.log(error);
@@ -143,23 +74,11 @@ class TaskRepository {
 
     async setStatusInProgress(id) {
         try {
-            const file = readFileSync(this.filePath);
+            await Task.findById(id).updateOne({
+                "status" : "in-progress"
+            });
 
-            const data = JSON.parse(file.toString());
-
-            const tasks = data.map(
-                function (task) {
-                    if (task['id'] == id) {
-                        task['status']  = 'in-progress';
-                    }
-                    return task;
-                }
-            );
-
-            await writeFile(this.filePath, JSON.stringify(tasks));
-
-            return "task status updated";
-
+            return "task updated";
 
         } catch (error) {
             console.log(error);
