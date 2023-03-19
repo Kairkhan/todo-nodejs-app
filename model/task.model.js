@@ -1,18 +1,15 @@
-const mongoose = require('mongoose');
+module.exports = (sequelize, Sequelize) => {
+    const Task = sequelize.define("task", {
+        title: {
+            type: Sequelize.STRING
+        },
+        description: {
+            type: Sequelize.STRING
+        },
+        status: {
+            type: Sequelize.STRING
+        }
+    }, {timestamps: false});
 
-const Task = new mongoose.Schema({
-    title: {
-        required: true,
-        type: String
-    },
-    description: {
-        required: true,
-        type: String
-    },
-    status: {
-        required: true,
-        type: String
-    }
-})
-
-module.exports = mongoose.model('Task', Task)
+    return Task;
+};

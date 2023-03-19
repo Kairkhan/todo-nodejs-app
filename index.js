@@ -1,26 +1,23 @@
-const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const {mongoose} = require('mongoose');
+const cors = require("cors");
 
-dotenv.config();
+const corsOptions = {
+    origin: "http://localhost:8081"
+};
 
+app.use(cors(corsOptions));
 
-const mongoString = process.env.DATABASE_URL;
+const db = require("./model");
+db.sequelize.sync()
+    .then(() => {
+        console.log("Synced db.");
+    })
+    .catch((err) => {
+        console.log("Failed to sync db: " + err.message);
+    });
 
-
-mongoose.connect(mongoString);
-
-const database = mongoose.connection;
-
-database.on('error', (error) => {
-    console.log(error)
-})
-
-database.once('connected', () => {
-    console.log('Database Connected');
-})
 
 const PORT = process.env.PORT || 3000;
 

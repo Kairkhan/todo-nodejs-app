@@ -1,4 +1,5 @@
-const Task = require("../model/task.model");
+const db = require("../model");
+const Task = db.task;
 
 class TaskRepository {
     constructor() {
@@ -11,7 +12,7 @@ class TaskRepository {
                 Object.entries(filters).filter(([key]) => this.listOfFilters.includes(key))
             );
 
-            return await Task.find(updatedFilters);
+            return await Task.findAll({where: updatedFilters});
 
         } catch (error) {
             console.log(error);
@@ -20,7 +21,7 @@ class TaskRepository {
 
     async getTaskById(id) {
         try {
-            return await Task.findById(id);
+            return await Task.findByPk(id);
 
         } catch (error) {
             console.log(error);
@@ -29,11 +30,11 @@ class TaskRepository {
 
     async createTask(requestBody) {
         try {
-            return await new Task({
+            return await Task.create({
                 "title" : requestBody['title'],
                 "description" : requestBody['description'],
                 "status" : "backlog"
-            }).save();
+            });
 
         } catch (error) {
             console.log(error);
@@ -42,10 +43,7 @@ class TaskRepository {
 
     async updateTask(id, requestBody) {
         try {
-            return await Task.findByIdAndUpdate(
-                id, requestBody, {new: true}
-            )
-
+            return await this.findAndUpdate(id, requestBody);
         } catch (error) {
             console.log(error);
         }
@@ -53,7 +51,16 @@ class TaskRepository {
 
     async deleteTask(id) {
         try {
-            return await Task.findByIdAndDelete(id);
+            const task = await Task.findByPk(id);
+
+            if (!task) {
+                return "not found id: " + id;
+            }
+
+            await task.destroy();
+
+            return 'task deleted';
+
         } catch (error) {
             console.log(error);
         }
@@ -61,11 +68,9 @@ class TaskRepository {
 
     async setStatusBacklog(id) {
         try {
-            await Task.findById(id).updateOne({
-               "status" : "backlog"
+            return await this.findAndUpdate(id, {
+                'status' : 'backlog'
             });
-
-            return "task updated"
 
         } catch (error) {
             console.log(error);
@@ -74,15 +79,27 @@ class TaskRepository {
 
     async setStatusInProgress(id) {
         try {
-            await Task.findById(id).updateOne({
-                "status" : "in-progress"
+            return await this.findAndUpdate(id, {
+                'status' : 'in-progress'
             });
-
-            return "task updated";
 
         } catch (error) {
             console.log(error);
         }
+    }
+
+    async findAndUpdate(id, payload) {
+        const task = await Task.findByPk(id);
+
+        if (!task) {
+            return "not found id: " + id;
+        }
+
+        await task.update(payload, {
+            where: { id: id }
+        });
+
+        return "task updated";
     }
 }
 
